@@ -64,11 +64,16 @@ h1 span{color:var(--muted)}
 .shot::after{content:'';position:absolute;inset:auto 0 0;height:45%;background:linear-gradient(transparent,var(--bg2))}
 
 /* цифры */
-.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:-20px auto 0;position:relative}
-.num{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
-.num b{display:block;font-size:30px;font-weight:800}
-.num small{color:var(--muted);font-size:14px}
-
+.numbers{padding-top:72px}
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:40px}
+.num{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:24px 24px 20px;min-height:150px}
+.num b{display:block;font-size:40px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.num>span{color:var(--muted);font-size:15px}
+.num small{display:flex;align-items:center;gap:7px;margin-top:16px;color:var(--dim);font-size:13px;min-height:18px}
+.num small em{font-style:normal;color:var(--ok);font-weight:600}
+.num .live{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.spark{position:absolute;right:18px;bottom:18px;width:72px;height:30px;fill:none;stroke:var(--ok);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.num.off{display:none}
 /* секции */
 section{padding:110px 0 0}
 .kicker{font-size:13px;font-weight:600;color:var(--ok);letter-spacing:.4px;text-transform:uppercase}
@@ -114,7 +119,9 @@ footer .r{margin-left:auto;display:flex;gap:20px}
   .wrap{padding:0 20px} nav{display:none} header .wrap{justify-content:space-between}
   h1{font-size:40px;letter-spacing:-.8px} .lead{font-size:16px} h2{font-size:32px}
   .cta{flex-direction:column;align-items:stretch;max-width:360px;margin:0 auto}
-  .nums,.grid{grid-template-columns:1fr 1fr} .row,.row.rev{grid-template-columns:1fr;gap:28px;margin-top:72px} .row.rev .txt{order:0}
+  .grid{grid-template-columns:1fr 1fr}
+  .nums{grid-template-columns:1fr 1fr}
+  .num b{font-size:32px} .row,.row.rev{grid-template-columns:1fr;gap:28px;margin-top:72px} .row.rev .txt{order:0}
   .log{grid-template-columns:1fr} .log aside{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow-x:auto} .log aside a{white-space:nowrap;gap:8px}
   footer .wrap{flex-direction:column;align-items:flex-start;gap:10px} footer .r{margin-left:0}
 }
@@ -142,12 +149,19 @@ html{scroll-behavior:smooth} section{scroll-margin-top:72px}
 </div></div>
 
 <div class="wrap">
-  <div class="nums">
-    <div class="num"><b>5</b><small>лаунчеров, чьи сборки видны сразу</small></div>
-    <div class="num"><b>3</b><small>загрузчика: Forge, NeoForge, Fabric</small></div>
-    <div class="num"><b>9</b><small>шагов запуска на схеме ошибок</small></div>
-    <div class="num"><b>0 ₽</b><small>навсегда, без рекламы</small></div>
-  </div>
+  <section id="numbers" class="numbers">
+    <div class="head">
+      <div class="kicker">В цифрах</div>
+      <h2>Rift Launcher сейчас</h2>
+      <p class="sub">Считается вживую — обновляется при каждом открытии страницы.</p>
+    </div>
+    <div class="nums">
+      <div class="num" id="n-dl"><svg class="spark" viewBox="0 0 90 36" aria-hidden="true"><polyline points=""/></svg><b>—</b><span>скачиваний</span><small></small></div>
+      <div class="num" id="n-hours"><b>—</b><span>наиграно в лаунчере</span><small></small></div>
+      <div class="num" id="n-rel"><b>—</b><span>версий вышло</span><small></small></div>
+      <div class="num" id="n-last"><b>—</b><span>последнее обновление</span><small></small></div>
+    </div>
+  </section>
 
   <section id="features">
     <div class="head">
@@ -253,8 +267,21 @@ html{scroll-behavior:smooth} section{scroll-margin-top:72px}
     body.innerHTML = '<h4>Версия ' + esc(ver(r)) + '</h4><div class="d">' + esc(day(r.published_at, true)) + ' · Windows</div>' +
       (items.length ? '<ul>' + items.map(function (l) { var t = tag(l); return '<li><span>' + t + esc(t ? l.replace(/^(исправлено|исправил[аио]?|починил[аио]?|фикс)\s*[:—-]?\s*/i, '') : l) + '</span></li>'; }).join('') + '</ul>' : '<p class="sub">Без описания.</p>');
   }
-  fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=8', { headers: { Accept: 'application/vnd.github+json' } })
-    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+  function nf(n) { return Math.round(n).toLocaleString('ru-RU').replace(/\u00a0/g, '\u2009'); }
+  function ago(iso) {
+    var m = Math.max(1, Math.round((Date.now() - new Date(iso)) / 60000));
+    if (m < 60) return m + ' мин назад';
+    var h = Math.round(m / 60); if (h < 24) return h + ' ч назад';
+    var d = Math.round(h / 24); return d === 1 ? 'вчера' : d + ' дн назад';
+  }
+  function plural(n, a, b, c) { var t = n % 10, h = n % 100; return t === 1 && h !== 11 ? a : t >= 2 && t <= 4 && (h < 12 || h > 14) ? b : c; }
+  function months(iso) { var m = Math.round((Date.now() - new Date(iso)) / (30.44 * 86400000)); return m < 1 ? 'меньше месяца' : m + ' ' + plural(m, 'месяц', 'месяца', 'месяцев'); }
+  function setNum(id, big, small) { var n = document.getElementById(id); n.querySelector('b').textContent = big; n.querySelector('small').innerHTML = small; }
+  function page(p) {
+    return fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=100&page=' + p, { headers: { Accept: 'application/vnd.github+json' } })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
+  }
+  page(1).then(function (a) { return a.length < 100 ? a : page(2).then(function (b) { return a.concat(b); }); })
     .then(function (all) {
       var list = all.filter(function (r) { return !r.draft && !r.prerelease && setup(r); });
       if (!list.length) throw new Error('empty');
@@ -262,6 +289,19 @@ html{scroll-behavior:smooth} section{scroll-margin-top:72px}
       document.querySelectorAll('.ver').forEach(function (n) { n.textContent = ver(list[0]); });
       document.querySelectorAll('.size').forEach(function (n) { n.innerHTML = '<i>•</i>' + Math.round(a.size / 1048576) + ' МБ'; });
       document.querySelectorAll('a.dl').forEach(function (n) { n.href = a.browser_download_url; });
+
+      var per = list.map(function (r) { return setup(r).download_count || 0; });
+      var total = per.reduce(function (x, y) { return x + y; }, 0);
+      setNum('n-dl', nf(total), '<em>+' + nf(per[0]) + '</em> за версию ' + esc(ver(list[0])));
+      var pts = per.slice(0, 12).reverse(), sum = 0, acc = pts.map(function (v) { return (sum += v); });
+      var mx = acc[acc.length - 1] || 1;
+      document.querySelector('#n-dl polyline').setAttribute('points', acc.map(function (v, i) {
+        return (acc.length > 1 ? i * 90 / (acc.length - 1) : 90).toFixed(1) + ',' + (33 - v / mx * 30).toFixed(1);
+      }).join(' '));
+      var first = list[list.length - 1];
+      setNum('n-rel', nf(list.length), 'с первой — ' + months(first.published_at) + ' назад');
+      setNum('n-last', ago(list[0].published_at), 'версия ' + esc(ver(list[0])));
+
       var aside = document.getElementById('log-list');
       aside.innerHTML = list.slice(0, 5).map(function (r) { return '<a href="#changes">' + esc(ver(r)) + ' <small>' + esc(day(r.published_at)) + '</small></a>'; }).join('') +
         '<a href="https://github.com/' + REPO + '/releases">Все версии →</a>';
@@ -269,8 +309,21 @@ html{scroll-behavior:smooth} section{scroll-margin-top:72px}
       show(list, 0);
     })
     .catch(function () {
+      ['n-dl', 'n-rel', 'n-last'].forEach(function (id) { document.getElementById(id).classList.add('off'); });
       document.getElementById('log-body').innerHTML = '<div class="d">Список изменений сейчас недоступен.</div><a class="btn" href="https://github.com/' + REPO + '/releases">Открыть все версии</a>';
     });
+
+  // Часы и «сейчас в сети» — из службы rift-api; файл раз в 3 часа обновляет задача stats.yml.
+  fetch('https://raw.githubusercontent.com/Rift-vanilla/rift-vanilla.github.io/main/stats.json', { cache: 'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (st) {
+      if (!st || !(st.totalMs > 0)) throw new Error('empty');
+      var h = st.totalMs / 3600000;
+      setNum('n-hours', nf(h) + ' ч', st.online > 0
+        ? '<span class="live"></span>сейчас в лаунчере: ' + nf(st.online)
+        : 'у ' + nf(st.players) + ' ' + plural(st.players, 'игрока', 'игроков', 'игроков'));
+    })
+    .catch(function () { document.getElementById('n-hours').classList.add('off'); });
 })();
 </script>
 </body>
