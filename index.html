@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rift Launcher — лаунчер Minecraft для сервера Rift</title>
+<meta name="description" content="Rift Launcher — быстрый лаунчер Minecraft: сборки с Modrinth и CurseForge, сборки других лаунчеров, друзья, статистика, 3D-скины и повторы.">
+<meta property="og:title" content="Rift Launcher">
+<meta property="og:description" content="Лаунчер Minecraft, который запускается мгновенно.">
+<meta property="og:image" content="img/home.webp">
+<meta name="theme-color" content="#0C0D0F">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<style>
+@font-face{font-family:'Rubik';font-style:normal;font-display:swap;font-weight:400;src:url(fonts/rubik-cyrillic-400-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Rubik';font-style:normal;font-display:swap;font-weight:500;src:url(fonts/rubik-cyrillic-500-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Rubik';font-style:normal;font-display:swap;font-weight:700;src:url(fonts/rubik-cyrillic-700-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Rubik';font-style:normal;font-display:swap;font-weight:800;src:url(fonts/rubik-cyrillic-800-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Rubik';font-style:normal;font-display:swap;font-weight:400;src:url(fonts/rubik-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Rubik';font-style:normal;font-display:swap;font-weight:500;src:url(fonts/rubik-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Rubik';font-style:normal;font-display:swap;font-weight:700;src:url(fonts/rubik-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Rubik';font-style:normal;font-display:swap;font-weight:800;src:url(fonts/rubik-latin-800-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{--bg:#111214;--bg2:#0C0D0F;--panel:#18191C;--panel2:#202226;--line:#2C2E33;--txt:#EEEEEC;--muted:#A3A29E;--dim:#77746F;--ok:#3DDC84;--r:16px}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg2);color:var(--txt);font-family:'Rubik',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* шапка */
+header{position:sticky;top:0;z-index:5;background:rgba(12,13,15,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;height:68px;gap:32px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px}
+.brand img{width:34px;height:34px}
+nav{display:flex;gap:26px;margin-left:auto;font-size:14px;color:var(--muted)}
+nav a:hover{color:var(--txt)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:44px;padding:0 20px;border-radius:12px;font-weight:600;font-size:15px;border:1px solid var(--line);background:var(--panel2);color:var(--txt)}
+.btn.main{background:var(--txt);color:#141414;border:0;box-shadow:inset 0 -3px 0 #c9c8c4}
+.btn.sm{height:38px;padding:0 16px;font-size:14px}
+.btn.xl{height:56px;padding:0 28px;font-size:17px;border-radius:14px}
+
+/* первый экран */
+.hero{position:relative;text-align:center;padding:84px 0 0;overflow:hidden}
+.hero::before{content:'';position:absolute;left:50%;top:-180px;width:1100px;height:700px;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(61,220,132,.13),transparent 70%);pointer-events:none}
+.pill{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 14px;border-radius:99px;background:var(--panel);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.pill b{color:var(--ok);font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+h1{font-size:60px;line-height:1.06;font-weight:800;letter-spacing:-1.5px;margin:22px auto 18px;max-width:1000px}
+h1 span{color:var(--muted)}
+.lead{font-size:19px;line-height:1.55;color:var(--muted);max-width:640px;margin:0 auto 34px}
+.cta{display:flex;justify-content:center;gap:12px}
+.meta{margin-top:16px;font-size:13px;color:var(--dim)}
+.meta i{font-style:normal;margin:0 8px;opacity:.5}
+.shot{position:relative;margin:64px auto 0;max-width:1120px;border-radius:18px 18px 0 0;border:1px solid var(--line);border-bottom:0;overflow:hidden;box-shadow:0 -20px 80px rgba(0,0,0,.6)}
+.shot img{display:block;width:100%;height:auto}
+.shot::after{content:'';position:absolute;inset:auto 0 0;height:45%;background:linear-gradient(transparent,var(--bg2))}
+
+/* цифры */
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:-20px auto 0;position:relative}
+.num{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
+.num b{display:block;font-size:30px;font-weight:800}
+.num small{color:var(--muted);font-size:14px}
+
+/* секции */
+section{padding:110px 0 0}
+.kicker{font-size:13px;font-weight:600;color:var(--ok);letter-spacing:.4px;text-transform:uppercase}
+h2{font-size:42px;line-height:1.1;font-weight:800;letter-spacing:-.8px;margin:12px 0 14px}
+.sub{font-size:17px;color:var(--muted);line-height:1.55;max-width:620px;margin:0}
+.head{text-align:center}.head .sub{margin:0 auto}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.f{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.f .t{width:44px;height:44px;border-radius:12px;background:var(--panel2);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.f h3{margin:0 0 8px;font-size:18px;font-weight:700}
+.f p{margin:0;color:var(--muted);font-size:15px;line-height:1.55}
+
+.row{display:grid;grid-template-columns:5fr 7fr;gap:56px;align-items:center;margin-top:100px}
+.row.rev{grid-template-columns:7fr 5fr}.row.rev .txt{order:2}
+.row ul{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:12px}
+.row li{display:flex;gap:12px;font-size:15px;color:var(--muted);line-height:1.5}
+.row li .ic{color:var(--ok);margin-top:1px}
+.pic{border-radius:var(--r);border:1px solid var(--line);overflow:hidden;background:var(--panel);box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.pic img{display:block;width:100%;height:auto}
+
+/* изменения */
+.log{margin-top:48px;display:grid;grid-template-columns:260px 1fr;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.log aside{border-right:1px solid var(--line);padding:12px}
+.log aside a{display:flex;justify-content:space-between;padding:12px 14px;border-radius:10px;font-size:14px;color:var(--muted)}
+.log aside a.on{background:var(--panel2);color:var(--txt);font-weight:600}
+.log aside a small{color:var(--dim)}
+.log .body{padding:28px 32px}
+.log .body h4{margin:0 0 4px;font-size:22px}
+.log .body .d{color:var(--dim);font-size:13px;margin-bottom:18px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 8px;border-radius:6px;margin-right:8px;background:rgba(61,220,132,.12);color:var(--ok)}
+.tag.fix{background:rgba(255,182,92,.12);color:#FFB65C}
+.log .body ul{margin:0;padding:0;list-style:none;display:grid;gap:10px;font-size:15px;color:var(--muted)}
+
+/* низ */
+.final{margin-top:110px;text-align:center;padding:72px 32px;border-radius:24px;background:radial-gradient(ellipse at top,rgba(61,220,132,.12),transparent 60%),var(--panel);border:1px solid var(--line)}
+.final img{width:132px;height:132px;margin-bottom:8px;filter:drop-shadow(0 18px 40px rgba(120,170,255,.25))}
+footer{margin-top:80px;border-top:1px solid var(--line);padding:28px 0 40px;color:var(--dim);font-size:13px}
+footer .wrap{display:flex;gap:24px;align-items:center}
+footer .r{margin-left:auto;display:flex;gap:20px}
+
+@media (max-width:900px){
+  .wrap{padding:0 20px} nav{display:none} header .wrap{justify-content:space-between}
+  h1{font-size:40px;letter-spacing:-.8px} .lead{font-size:16px} h2{font-size:32px}
+  .cta{flex-direction:column;align-items:stretch;max-width:360px;margin:0 auto}
+  .nums,.grid{grid-template-columns:1fr 1fr} .row,.row.rev{grid-template-columns:1fr;gap:28px;margin-top:72px} .row.rev .txt{order:0}
+  .log{grid-template-columns:1fr} .log aside{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow-x:auto} .log aside a{white-space:nowrap;gap:8px}
+  footer .wrap{flex-direction:column;align-items:flex-start;gap:10px} footer .r{margin-left:0}
+}
+@media (max-width:560px){ .nums,.grid{grid-template-columns:1fr} h1{font-size:34px} .final{padding:48px 20px} }
+html{scroll-behavior:smooth} section{scroll-margin-top:72px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="#"><img src="img/logo.png" alt="">Rift Launcher</a>
+  <nav><a href="#features">Возможности</a><a href="#changes">Изменения</a></nav>
+  <a class="btn main sm dl" href="https://github.com/Rift-vanilla/launcher-files/releases/latest"><i data-i="download"></i>Скачать</a>
+</div></header>
+
+<div class="hero"><div class="wrap">
+  <span class="pill"><span class="dot"></span><b>Версия <span class="ver">2.23.0</span></b> — уже вышла</span>
+  <h1>Лаунчер Minecraft,<br><span>который запускается мгновенно</span></h1>
+  <p class="lead">Сборки с Modrinth и CurseForge, друзья, статистика, скины и повторы — в одном аккуратном окне.</p>
+  <div class="cta">
+    <a class="btn main xl dl" href="https://github.com/Rift-vanilla/launcher-files/releases/latest"><i data-i="download"></i>Скачать для Windows</a>
+    <a class="btn xl" href="#features"><i data-i="spark"></i>Что умеет</a>
+  </div>
+  <div class="meta">Windows 10 и 11<i>•</i>64 бит<i>•</i>обновляется сам</div>
+  <div class="shot"><img src="img/home.webp" width="1920" height="1200" alt="Главная Rift Launcher"></div>
+</div></div>
+
+<div class="wrap">
+  <div class="nums">
+    <div class="num"><b>5</b><small>лаунчеров, чьи сборки видны сразу</small></div>
+    <div class="num"><b>3</b><small>загрузчика: Forge, NeoForge, Fabric</small></div>
+    <div class="num"><b>9</b><small>шагов запуска на схеме ошибок</small></div>
+    <div class="num"><b>0 ₽</b><small>навсегда, без рекламы</small></div>
+  </div>
+
+  <section id="features">
+    <div class="head">
+      <div class="kicker">Возможности</div>
+      <h2>Всё для игры — без лишнего</h2>
+      <p class="sub">Ставь сборки, играй с друзьями и смотри, сколько наиграл. Остальное лаунчер сделает сам.</p>
+    </div>
+    <div class="grid">
+      <div class="f"><div class="t"><i data-i="layers"></i></div><h3>Сборки из любых лаунчеров</h3><p>CurseForge, Modrinth App, Prism, MultiMC и ATLauncher находятся сами и запускаются прямо из своих папок.</p></div>
+      <div class="f"><div class="t"><i data-i="search"></i></div><h3>Каталог модов</h3><p>Modrinth и CurseForge в одном поиске. Подходящие версии подбираются под сборку — встанет без ошибок.</p></div>
+      <div class="f"><div class="t"><i data-i="friends"></i></div><h3>Друзья и чат</h3><p>Видно, кто во что играет. Зови в игру одной кнопкой — с Discord или лицензионным аккаунтом.</p></div>
+      <div class="f"><div class="t"><i data-i="chart"></i></div><h3>Статистика на сервере</h3><p>Часы по сборкам и дням не теряются при переустановке и смене компьютера.</p></div>
+      <div class="f"><div class="t"><i data-i="replay"></i></div><h3>Повторы и видео</h3><p>Записи Replay Mod из всех сборок в одном месте, FFmpeg для рендера ставится в один клик.</p></div>
+      <div class="f"><div class="t"><i data-i="shield"></i></div><h3>Понятные ошибки</h3><p>Если игра не стартовала — схема шагов покажет, где остановилось и что сделать.</p></div>
+    </div>
+
+    <div class="row">
+      <div class="txt">
+        <div class="kicker">Запуск</div>
+        <h2>Видно, где сломалось</h2>
+        <p class="sub">Вместо «игра завершилась с кодом 1» — схема запуска, причина простыми словами и нужный кусок лога.</p>
+        <ul>
+          <li><i data-i="check"></i>Аккаунт, Java, файлы и библиотеки готовятся параллельно</li>
+          <li><i data-i="check"></i>Готовый загрузчик из другого лаунчера не ставится заново</li>
+          <li><i data-i="check"></i>Не хватает мода — лаунчер подскажет, какого</li>
+        </ul>
+      </div>
+      <div class="pic"><img src="img/launch-error.webp" loading="lazy" alt="Окно ошибки запуска"></div>
+    </div>
+
+    <div class="row rev">
+      <div class="txt">
+        <div class="kicker">Статистика</div>
+        <h2>Сколько ты наиграл</h2>
+        <p class="sub">По дням, сборкам и сессиям. Серия дней подряд, самая долгая игра и любимая сборка.</p>
+        <ul>
+          <li><i data-i="check"></i>Хранится в облаке и не пропадает</li>
+          <li><i data-i="check"></i>Профиль и статистика друзей</li>
+        </ul>
+      </div>
+      <div class="pic"><img src="img/stats.webp" loading="lazy" alt="Статистика"></div>
+    </div>
+
+    <div class="row">
+      <div class="txt">
+        <div class="kicker">Скины</div>
+        <h2>Скин в 3D</h2>
+        <p class="sub">Крути мышью, приближай колесом, меняй и скачивай PNG. Работает и с лицензией, и с аккаунтом Rift.</p>
+      </div>
+      <div class="pic"><img src="img/skins.webp" loading="lazy" alt="Скины"></div>
+    </div>
+  </section>
+
+  <section id="changes">
+    <div class="head">
+      <div class="kicker">Изменения</div>
+      <h2>Что нового</h2>
+      <p class="sub">Подтягивается из релизов на GitHub автоматически.</p>
+    </div>
+    <div class="log" id="log"><aside id="log-list"></aside><div class="body" id="log-body"><div class="d">Загружаю список изменений…</div></div></div>
+  </section>
+
+  <div class="final">
+    <img src="img/logo.png" alt="">
+    <h2>Готов играть?</h2>
+    <p class="sub" style="margin:0 auto 28px">Установка за минуту. Все сборки — уже внутри.</p>
+    <a class="btn main xl dl" href="https://github.com/Rift-vanilla/launcher-files/releases/latest"><i data-i="download"></i>Скачать Rift Launcher</a>
+    <div class="meta"><span class="ver">2.23.0</span><i>•</i>Windows 10 и 11<span class="size"></span></div>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <span class="brand" style="font-size:15px"><img src="img/logo.png" alt="" style="width:20px;height:20px">Rift Launcher</span>
+  <span>Не является официальным продуктом Minecraft. Не связан с Mojang и Microsoft.</span>
+  <span class="r"><a href="https://github.com/Rift-vanilla/launcher-files/releases">Все версии</a></span>
+</div></footer>
+
+<script>
+(function () {
+  'use strict';
+  var I = {"chart": "M4 20V10M10 20V4M16 20v-7M22 20H2", "check": "M5 12.5l4.5 4.5L19 7", "download": "M12 4v12M7 11l5 5 5-5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3", "friends": "M9 11.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.6c1.9.6 3.1 2.4 3.5 5.4", "layers": "M12 3 21 8l-9 5-9-5zM3 12.5l9 5 9-5M3 16.5l9 5 9-5", "replay": "M3.5 12a8.5 8.5 0 1 0 2.5-6L3.5 8.5M3.5 4v4.5H8M10.5 9v6l5-3z", "search": "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4", "shield": "M12 3l7 3v5.5c0 4.4-3 8.2-7 9.5-4-1.3-7-5.1-7-9.5V6z", "spark": "M12 3l1.9 5.6L19.5 10.5 13.9 12.4 12 18l-1.9-5.6-5.6-1.9 5.6-1.9zM19 16v4M17 18h4"};
+  document.querySelectorAll('[data-i]').forEach(function (n) {
+    n.outerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (I[n.dataset.i] || '') + '"/></svg>';
+  });
+
+  var REPO = 'Rift-vanilla/launcher-files';
+  var MONTHS = ['янв.', 'февр.', 'марта', 'апр.', 'мая', 'июня', 'июля', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.'];
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function day(iso, year) { var d = new Date(iso); return d.getDate() + ' ' + MONTHS[d.getMonth()] + (year ? ' ' + d.getFullYear() : ''); }
+  function ver(r) { return String(r.tag_name || '').replace(/^v/, ''); }
+  function setup(r) { return (r.assets || []).filter(function (a) { return /setup.*\.exe$/i.test(a.name); })[0]; }
+  function lines(body) {
+    return String(body || '').split(/\r?\n/).map(function (l) { return l.replace(/^\s*[-*•]\s*/, '').replace(/\*\*/g, '').trim(); })
+      .filter(function (l) { return l && !/^#/.test(l); }).slice(0, 12);
+  }
+  function tag(l) {
+    if (/^(исправ|починил|фикс)/i.test(l)) return '<span class="tag fix">Исправлено</span>';
+    return '';
+  }
+  function show(list, i) {
+    var r = list[i], body = document.getElementById('log-body'), items = lines(r.body);
+    document.querySelectorAll('#log-list a').forEach(function (a, k) { a.classList.toggle('on', k === i); });
+    body.innerHTML = '<h4>Версия ' + esc(ver(r)) + '</h4><div class="d">' + esc(day(r.published_at, true)) + ' · Windows</div>' +
+      (items.length ? '<ul>' + items.map(function (l) { var t = tag(l); return '<li><span>' + t + esc(t ? l.replace(/^(исправлено|исправил[аио]?|починил[аио]?|фикс)\s*[:—-]?\s*/i, '') : l) + '</span></li>'; }).join('') + '</ul>' : '<p class="sub">Без описания.</p>');
+  }
+  fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=8', { headers: { Accept: 'application/vnd.github+json' } })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (all) {
+      var list = all.filter(function (r) { return !r.draft && !r.prerelease && setup(r); });
+      if (!list.length) throw new Error('empty');
+      var a = setup(list[0]);
+      document.querySelectorAll('.ver').forEach(function (n) { n.textContent = ver(list[0]); });
+      document.querySelectorAll('.size').forEach(function (n) { n.innerHTML = '<i>•</i>' + Math.round(a.size / 1048576) + ' МБ'; });
+      document.querySelectorAll('a.dl').forEach(function (n) { n.href = a.browser_download_url; });
+      var aside = document.getElementById('log-list');
+      aside.innerHTML = list.slice(0, 5).map(function (r) { return '<a href="#changes">' + esc(ver(r)) + ' <small>' + esc(day(r.published_at)) + '</small></a>'; }).join('') +
+        '<a href="https://github.com/' + REPO + '/releases">Все версии →</a>';
+      aside.querySelectorAll('a[href="#changes"]').forEach(function (n, k) { n.addEventListener('click', function (e) { e.preventDefault(); show(list, k); }); });
+      show(list, 0);
+    })
+    .catch(function () {
+      document.getElementById('log-body').innerHTML = '<div class="d">Список изменений сейчас недоступен.</div><a class="btn" href="https://github.com/' + REPO + '/releases">Открыть все версии</a>';
+    });
+})();
+</script>
+</body>
+</html>
