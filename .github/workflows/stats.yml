@@ -22,13 +22,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Забрать цифры
+        env:
+          # Адрес службы лежит в секрете репозитория RIFT_API_STATS, а не в коде.
+          URL: ${{ secrets.RIFT_API_STATS }}
         run: |
+          if [ -z "$URL" ]; then echo "::warning::Не задан секрет RIFT_API_STATS — цифры не обновлены"; exit 0; fi
           # -k: сертификат службы самоподписанный; данные открытые, без ников.
-          curl -skf --max-time 20 https://d5.rustix.me:26659/public/stats -o raw.json
+          curl -skf --max-time 20 "$URL" -o raw.json
           jq -e 'has("totalMs") and has("players") and (.totalMs|type=="number")' raw.json >/dev/null
           jq -c '{totalMs, players, users, sessions, online, at}' raw.json > stats.json
           rm raw.json
-          cat stats.json
       - name: Сохранить, если изменилось
         run: |
           if git diff --quiet -- stats.json; then echo "без изменений"; exit 0; fi
