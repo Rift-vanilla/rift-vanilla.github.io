@@ -1,4 +1,4 @@
-# Сайт Rift Launcher
+# Сайт Schalker Launcher
 
 Статическая страница без сборки: `index.html`, картинки в `img/`, шрифт Rubik в `fonts/`.
 
